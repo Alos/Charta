@@ -1,6 +1,6 @@
 /*
  * Jakefile
- * null
+ * Charta
  *
  * Created by Alos on May 1, 2013.
  * Copyright 2013, Your Company All rights reserved.
@@ -15,17 +15,18 @@ var ENV = require("system").env,
     configuration = ENV["CONFIG"] || ENV["CONFIGURATION"] || ENV["c"] || "Debug",
     OS = require("os");
 
-app ("null", function(task)
+app ("Charta", function(task)
 {
-    task.setBuildIntermediatesPath(FILE.join("Build", "null.build", configuration));
+    ENV["OBJJ_INCLUDE_PATHS"] = "Frameworks/Debug:Frameworks";
+    task.setBuildIntermediatesPath(FILE.join("Build", "Charta.build", configuration));
     task.setBuildPath(FILE.join("Build", configuration));
 
-    task.setProductName("null");
-    task.setIdentifier("com.yourcompany.");
+    task.setProductName("Charta");
+    task.setIdentifier("com.alosinc.");
     task.setVersion("1.0");
-    task.setAuthor("Your Company");
-    task.setEmail("feedback @nospam@ yourcompany.com");
-    task.setSummary("null");
+    task.setAuthor("Alos Inc");
+    task.setEmail("feedback @alosii@ gmail.com");
+    task.setSummary("Charta");
     task.setSources((new FileList("**/*.j")).exclude(FILE.join("Build", "**")));
     task.setResources(new FileList("Resources/**"));
     task.setIndexFilePath("index.html");
@@ -37,7 +38,7 @@ app ("null", function(task)
         task.setCompilerFlags("-O");
 });
 
-task ("default", ["null"], function()
+task ("default", ["Charta"], function()
 {
     printResults(configuration);
 });
@@ -58,36 +59,36 @@ task ("release", function()
 
 task ("run", ["debug"], function()
 {
-    OS.system(["open", FILE.join("Build", "Debug", "null", "index.html")]);
+    OS.system(["open", FILE.join("Build", "Debug", "Charta", "index.html")]);
 });
 
 task ("run-release", ["release"], function()
 {
-    OS.system(["open", FILE.join("Build", "Release", "null", "index.html")]);
+    OS.system(["open", FILE.join("Build", "Release", "Charta", "index.html")]);
 });
 
 task ("deploy", ["release"], function()
 {
-    FILE.mkdirs(FILE.join("Build", "Deployment", "null"));
-    OS.system(["press", "-f", FILE.join("Build", "Release", "null"), FILE.join("Build", "Deployment", "null")]);
+    FILE.mkdirs(FILE.join("Build", "Deployment", "Charta"));
+    OS.system(["press", "-f", FILE.join("Build", "Release", "Charta"), FILE.join("Build", "Deployment", "Charta")]);
     printResults("Deployment")
 });
 
 task ("desktop", ["release"], function()
 {
-    FILE.mkdirs(FILE.join("Build", "Desktop", "null"));
-    require("cappuccino/nativehost").buildNativeHost(FILE.join("Build", "Release", "null"), FILE.join("Build", "Desktop", "null", "null.app"));
+    FILE.mkdirs(FILE.join("Build", "Desktop", "Charta"));
+    require("cappuccino/nativehost").buildNativeHost(FILE.join("Build", "Release", "Charta"), FILE.join("Build", "Desktop", "Charta", "Charta.app"));
     printResults("Desktop")
 });
 
 task ("run-desktop", ["desktop"], function()
 {
-    OS.system([FILE.join("Build", "Desktop", "null", "null.app", "Contents", "MacOS", "NativeHost"), "-i"]);
+    OS.system([FILE.join("Build", "Desktop", "Charta", "Charta.app", "Contents", "MacOS", "NativeHost"), "-i"]);
 });
 
 function printResults(configuration)
 {
     print("----------------------------");
-    print(configuration+" app built at path: "+FILE.join("Build", configuration, "null"));
+    print(configuration+" app built at path: "+FILE.join("Build", configuration, "Charta"));
     print("----------------------------");
 }

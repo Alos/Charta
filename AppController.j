@@ -10,6 +10,7 @@
 
 @import <WKTextView/WKTextView.j>
 @import "CPView+ApplyShadow.j"
+@import "ui/CharacterSheetButton.j"
 
 var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
     BoldToolbarItemIdentifier = "BoldToolbarItemIdentifier",
@@ -33,6 +34,8 @@ var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
     CPView contentView;
     WKTextView  editorView;
     CPToolBar   toolbar;
+    CharacterSheetButton characterSheetButton;
+
 }
 
 - (void)applicationDidFinishLaunching:(CPNotification)aNotification
@@ -45,23 +48,31 @@ var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
     [contentView setBackgroundColor:[CPColor colorWithPatternImage:colorImage]];
 
     var middle = (CGRectGetWidth([contentView bounds]) / 2) - 400;
+    var calculatedEditorFrame = CGRectMake(middle, 40, 1000, CGRectGetHeight([contentView bounds]) - 80);
 
-    editorView = [[WKTextView alloc] initWithFrame:CGRectMake(middle, 40, 1000, CGRectGetHeight([contentView bounds]) - 80)];
+    //Add the main editor
+    editorView = [[WKTextView alloc] initWithFrame:calculatedEditorFrame];
     [editorView setAutohidesScrollers:NO];
     [editorView setAutoresizingMask: CPViewHeightSizable | CPViewMaxXMargin];
     [editorView setDelegate:self];
     [editorView setShouldFocusAfterAction:YES];
-
-    //add a shadow
-    [editorView applyShadow: [CPColor blackColor] offset: 5.0];
-
-
+    //Adding shadow
+    var editorViewShadow = [[CPShadowView alloc] initWithFrame:CGRectMakeZero()];
+    [editorViewShadow setFrameForContentFrame: calculatedEditorFrame];
+    [editorViewShadow setAutoresizingMask:CPViewHeightSizable | CPViewMaxXMargin];
+    [contentView addSubview:editorViewShadow];
     [contentView addSubview:editorView];
+    
 
-
-
-
-
+    //Add the character sheet button
+    characterSheetButton = [[CharacterSheetButton alloc]  initWithFrame: CGRectMake(CGRectGetWidth([contentView bounds]) - 50, CGRectGetHeight([contentView bounds])/2 , 36 , 50)];
+    [characterSheetButton setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
+    //Add a shadow to the button
+    var characterSheetButtonShadow = [[CPShadowView alloc] initWithFrame:CGRectMakeZero()];
+    [characterSheetButtonShadow setFrameForContentFrame: CGRectMake(CGRectGetWidth([contentView bounds]) - 50, CGRectGetHeight([contentView bounds])/2 , 36 , 50)];
+    [characterSheetButtonShadow setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
+    [contentView addSubview:characterSheetButtonShadow];
+    [contentView addSubview:characterSheetButton];
 
     toolbar = [[CPToolbar alloc] initWithIdentifier:"Styling"];
     [toolbar setDelegate:self];

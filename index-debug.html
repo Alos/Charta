@@ -24,7 +24,7 @@
 
         <script type="text/javascript">
             OBJJ_MAIN_FILE = "main.j";
-            OBJJ_INCLUDE_PATHS = ["Frameworks/Debug", "Frameworks", "Resources/WKTextView"];
+            OBJJ_INCLUDE_PATHS = ["Frameworks/Debug", "Frameworks", "Frameworks/WKTextView"];
         </script>
 
         <script src="Frameworks/Debug/Objective-J/Objective-J.js" type="text/javascript" charset="UTF-8"></script>
@@ -35,7 +35,7 @@
             // DEBUG OPTIONS:
 
             // Uncomment to enable printing of backtraces on exceptions:
-            //objj_msgSend_decorate(objj_backtrace_decorator);
+            objj_msgSend_decorate(objj_backtrace_decorator);
 
             // Uncomment to supress exceptions that take place inside a message
             //objj_msgSend_decorate(objj_supress_exceptions_decorator)
@@ -50,7 +50,7 @@
             //CPLogUnregister(CPLogDefault);
 
             // Uncomment to enable a specific logger:
-            //CPLogRegister(CPLogConsole);
+            CPLogRegister(CPLogConsole);
             //CPLogRegister(CPLogPopup);
 
             // Tag view DOM elements with a "data-cappuccino-view" attribute that contains
