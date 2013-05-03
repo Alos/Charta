@@ -23,15 +23,13 @@
         [characterSheetImageView setHasShadow:NO];
         [characterSheetImageView setImage: characterSheetImage];
         [self addSubview:characterSheetImageView];
-
-         var mShadowView = [[CPShadowView alloc] initWithFrame:CGRectMakeZero()];
-    	[mShadowView setFrameForContentFrame:[self frame]];
-    	[mShadowView setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
-    	[self addSubview:mShadowView];
-    	//[self addSubview:mGraphicView];
-	    //[mainContentView addSubview:contentView];
+        
 	}
 	return self;
+}
+
+- (void) mouseDown:(CPEvent) anEvent{
+	[[CPNotificationCenter defaultCenter] postNotificationName:"ShowCharacterSheetView" object:self userInfo: nil];
 }
 
 @end

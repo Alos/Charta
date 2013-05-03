@@ -11,6 +11,9 @@
 @import <WKTextView/WKTextView.j>
 @import "CPView+ApplyShadow.j"
 @import "ui/CharacterSheetButton.j"
+@import "ui/LightBoxView.j"
+
+@import "ui/CharacterSheet/CharacterSheetView.j"
 
 var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
     BoldToolbarItemIdentifier = "BoldToolbarItemIdentifier",
@@ -29,12 +32,29 @@ var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
     NumbersToolbarItemIdentifier = "NumbersToolbarItemIdentifier",
     RandomTextToolbarItemIdentifier = "RandomTextToolbarItemIdentifier";
 
+
+var CHARACTERSHEETWIDTH = 800;
+var CHARACTERSHEETHEIGHT = 800;
+
 @implementation AppController : CPObject
 {
     CPView contentView;
     WKTextView  editorView;
     CPToolBar   toolbar;
     CharacterSheetButton characterSheetButton;
+
+    //Sheets
+    CPArray sheetsArray;
+    CPArray shadowArray;
+    LightBoxView lightBoxView;
+
+    //CharacterSheet stuff
+    CPPoint characterSheetOrigin;
+    CPPoint characterSheetDestination;
+    CharacterSheetView characterSheetView;
+    CPShadowView characterSheetViewShadow;
+    CPViewAnimation characterSheetAnimation;
+    CPViewAnimation characterSheetShadowAnimation;
 
 }
 
@@ -66,11 +86,11 @@ var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
 
     //Add the character sheet button
     characterSheetButton = [[CharacterSheetButton alloc]  initWithFrame: CGRectMake(CGRectGetWidth([contentView bounds]) - 50, CGRectGetHeight([contentView bounds])/2 , 36 , 50)];
-    [characterSheetButton setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
+    [characterSheetButton setAutoresizingMask:CPViewMinXMargin | CPViewMinYMargin | CPViewMaxYMargin];
     //Add a shadow to the button
     var characterSheetButtonShadow = [[CPShadowView alloc] initWithFrame:CGRectMakeZero()];
     [characterSheetButtonShadow setFrameForContentFrame: CGRectMake(CGRectGetWidth([contentView bounds]) - 50, CGRectGetHeight([contentView bounds])/2 , 36 , 50)];
-    [characterSheetButtonShadow setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
+    [characterSheetButtonShadow setAutoresizingMask:CPViewMinXMargin | CPViewMinYMargin | CPViewMaxYMargin];
     [contentView addSubview:characterSheetButtonShadow];
     [contentView addSubview:characterSheetButton];
 
@@ -82,7 +102,89 @@ var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
     [theWindow orderFront:self];
 
 
+    //Initializing the sheets
+    sheetsArray =  [[CPArray alloc] init];
+    shadowArray = [[CPArray alloc] init];
+    //Character sheet
+    characterSheetOrigin = CPPointMake(CGRectGetWidth([contentView bounds]) + CHARACTERSHEETWIDTH, CGRectGetHeight([contentView bounds])/2 - (CHARACTERSHEETHEIGHT/2));
+    characterSheetDestination = CPPointMake(CGRectGetWidth([contentView bounds]) - CHARACTERSHEETWIDTH, CGRectGetHeight([contentView bounds])/2 - (CHARACTERSHEETHEIGHT/2));
+
+    characterSheetView = [[CharacterSheetView alloc] initWithFrame: CGRectMake( CGRectGetWidth([contentView bounds]) + CHARACTERSHEETWIDTH, CGRectGetHeight([contentView bounds])/2 - (CHARACTERSHEETHEIGHT/2) , CHARACTERSHEETWIDTH, CHARACTERSHEETHEIGHT)];
+    [characterSheetView setAutoresizingMask: CPViewMinXMargin | CPViewMinYMargin | CPViewMaxYMargin];
+    //Creating shadow
+    characterSheetViewShadow = [[CPShadowView alloc] initWithFrame:CGRectMakeZero()];
+    [characterSheetViewShadow setFrameForContentFrame: [characterSheetView frame]];
+    [characterSheetViewShadow setAutoresizingMask: CPViewMinXMargin | CPViewMinYMargin | CPViewMaxYMargin];
+    shadowArray.push(characterSheetViewShadow);
+    sheetsArray.push(characterSheetView);
+
+
+    //Creating the lightbox
+    lightBoxView = [[LightBoxView alloc] initWithFrame: [contentView bounds]];
+    [lightBoxView setAutoresizingMask: CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
+
+    //Animation
+    //TODO use single animation for both objects
+    if (!characterSheetAnimation)
+    {
+        characterSheetAnimation = [[CPViewAnimation alloc] initWithDuration:1 animationCurve:CPAnimationLinear];
+        [characterSheetAnimation setDelegate:self];
+    }
+    if (!characterSheetShadowAnimation)
+    {
+        characterSheetShadowAnimation = [[CPViewAnimation alloc] initWithDuration:1 animationCurve:CPAnimationLinear];
+        [characterSheetShadowAnimation setDelegate:self];
+    }
+
+    //Notifications
+    [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(showCharacterSheetView:) name:"ShowCharacterSheetView" object:nil];
+    [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(removeSheets:) name:"RemoveSheets" object:nil];
+
+
 }
+
+- (void)animationDidEnd:(CPViewAnimation)aViewAnimation{
+
+
+}
+
+
+
+@end
+
+
+@implementation AppController (NotificationHandlers)
+
+
+- (void) showCharacterSheetView:(CPNotification) aNotification{
+    CPLog.trace([characterSheetView superview]);
+    CPLog.trace(contentView);
+    [contentView addSubview: lightBoxView];
+    [contentView addSubview:characterSheetViewShadow];
+    [contentView addSubview:characterSheetView];
+    animateViewToPoint(characterSheetView, characterSheetDestination, characterSheetAnimation);
+    animateViewToPoint(characterSheetViewShadow, characterSheetDestination, characterSheetShadowAnimation);
+    
+}
+
+-(void) removeSheets:(CPNotification)aNotification{
+    [lightBoxView removeFromSuperview];
+
+
+    //TODO dont do this with the array as other sheets will not reset themselfs to the correct pos
+
+    [sheetsArray makeObjectsPerformSelector: @selector(removeFromSuperview)];
+    [sheetsArray makeObjectsPerformSelector: @selector(setFrameOrigin:) withObject: characterSheetOrigin];
+
+    [shadowArray makeObjectsPerformSelector: @selector(removeFromSuperview)];
+    [shadowArray makeObjectsPerformSelector: @selector(setFrameOrigin:) withObject: characterSheetOrigin];
+
+}
+
+@end
+
+
+@implementation AppController (ToolBarImplementation)
 
 
 // Return an array of toolbar item identifier (all the toolbar items that may be present in the toolbar)
@@ -209,3 +311,22 @@ var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
 }
 
 @end
+
+var animateViewToPoint = function(view, point, animation)
+{
+    var dict = [CPDictionary dictionary],
+        frame1 = [view frame],
+        frame2 = [view frame];
+        
+    frame2.origin = point;
+        
+    [dict setValue:view forKey:CPViewAnimationTargetKey];
+    [dict setValue:frame1 forKey:CPViewAnimationStartFrameKey];
+    [dict setValue:frame2 forKey:CPViewAnimationEndFrameKey];
+    
+    [animation setViewAnimations:[dict]];
+    [animation startAnimation];
+};
+
+
+
