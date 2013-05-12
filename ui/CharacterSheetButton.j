@@ -10,7 +10,6 @@
 - (id) initWithFrame:(CGRect) aFrame {
 
 	if (self = [super initWithFrame:aFrame]){
-		CPLog.trace("Creating character sheet");
 		[self setBackgroundColor: [CPColor  colorWithHexString:@"DFDFDF"]];
 
 		characterSheetImage = [[CPImage alloc] initWithContentsOfFile:[[CPBundle mainBundle] pathForResource:@"runner.png"] size:CGSizeMake(18, 25)];

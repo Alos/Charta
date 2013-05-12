@@ -9,11 +9,11 @@
 @import <Foundation/CPObject.j>
 
 @import <WKTextView/WKTextView.j>
-@import "CPView+ApplyShadow.j"
 @import "ui/CharacterSheetButton.j"
 @import "ui/LightBoxView.j"
 
 @import "ui/CharacterSheet/CharacterSheetView.j"
+@import "ui/CharacterSheet/CharacterSheetWindow.j"
 
 var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
     BoldToolbarItemIdentifier = "BoldToolbarItemIdentifier",
@@ -43,19 +43,8 @@ var CHARACTERSHEETHEIGHT = 800;
     CPToolBar   toolbar;
     CharacterSheetButton characterSheetButton;
 
-    //Sheets
-    CPArray sheetsArray;
-    CPArray shadowArray;
-    LightBoxView lightBoxView;
-
-    //CharacterSheet stuff
-    CPPoint characterSheetOrigin;
-    CPPoint characterSheetDestination;
-    CharacterSheetView characterSheetView;
-    CPShadowView characterSheetViewShadow;
-    CPViewAnimation characterSheetAnimation;
-    CPViewAnimation characterSheetShadowAnimation;
-
+    LightBoxView characterSheetlightBoxView;
+    CharacterSheetWindow characterSheetWindow;
 }
 
 - (void)applicationDidFinishLaunching:(CPNotification)aNotification
@@ -100,55 +89,21 @@ var CHARACTERSHEETHEIGHT = 800;
     [theWindow setToolbar:toolbar];
 
     [theWindow orderFront:self];
-
-
-    //Initializing the sheets
-    sheetsArray =  [[CPArray alloc] init];
-    shadowArray = [[CPArray alloc] init];
-    //Character sheet
-    characterSheetOrigin = CPPointMake(CGRectGetWidth([contentView bounds]) + CHARACTERSHEETWIDTH, CGRectGetHeight([contentView bounds])/2 - (CHARACTERSHEETHEIGHT/2));
-    characterSheetDestination = CPPointMake(CGRectGetWidth([contentView bounds]) - CHARACTERSHEETWIDTH, CGRectGetHeight([contentView bounds])/2 - (CHARACTERSHEETHEIGHT/2));
-
-    characterSheetView = [[CharacterSheetView alloc] initWithFrame: CGRectMake( CGRectGetWidth([contentView bounds]) + CHARACTERSHEETWIDTH, CGRectGetHeight([contentView bounds])/2 - (CHARACTERSHEETHEIGHT/2) , CHARACTERSHEETWIDTH, CHARACTERSHEETHEIGHT)];
-    [characterSheetView setAutoresizingMask: CPViewMinXMargin | CPViewMinYMargin | CPViewMaxYMargin];
-    //Creating shadow
-    characterSheetViewShadow = [[CPShadowView alloc] initWithFrame:CGRectMakeZero()];
-    [characterSheetViewShadow setFrameForContentFrame: [characterSheetView frame]];
-    [characterSheetViewShadow setAutoresizingMask: CPViewMinXMargin | CPViewMinYMargin | CPViewMaxYMargin];
-    shadowArray.push(characterSheetViewShadow);
-    sheetsArray.push(characterSheetView);
-
-
+    //Creating helper windows
+    characterSheetWindow = [[CharacterSheetWindow alloc] initWithContentRect: CGRectMake( CGRectGetWidth([contentView bounds]) + CHARACTERSHEETWIDTH, CGRectGetHeight([contentView bounds])/2 - (CHARACTERSHEETHEIGHT/2) , CHARACTERSHEETWIDTH, CHARACTERSHEETHEIGHT)
+                                                         styleMask: CPTitledWindowMask];
+    
     //Creating the lightbox
-    lightBoxView = [[LightBoxView alloc] initWithFrame: [contentView bounds]];
-    [lightBoxView setAutoresizingMask: CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
+    characterSheetlightBoxView = [[LightBoxView alloc] initWithFrame: [contentView bounds]];
+    [characterSheetlightBoxView setAutoresizingMask: CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
 
-    //Animation
-    //TODO use single animation for both objects
-    if (!characterSheetAnimation)
-    {
-        characterSheetAnimation = [[CPViewAnimation alloc] initWithDuration:1 animationCurve:CPAnimationLinear];
-        [characterSheetAnimation setDelegate:self];
-    }
-    if (!characterSheetShadowAnimation)
-    {
-        characterSheetShadowAnimation = [[CPViewAnimation alloc] initWithDuration:1 animationCurve:CPAnimationLinear];
-        [characterSheetShadowAnimation setDelegate:self];
-    }
-
+   
     //Notifications
     [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(showCharacterSheetView:) name:"ShowCharacterSheetView" object:nil];
-    [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(removeSheets:) name:"RemoveSheets" object:nil];
-
-
-}
-
-- (void)animationDidEnd:(CPViewAnimation)aViewAnimation{
-
+    [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(removeCharacterSheet:) name:"RemoveSheet" object:characterSheetlightBoxView];
+    [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(characterSheetWindowBacameMain:) name:"CPWindowDidBecomeMainNotification" object:characterSheetWindow];
 
 }
-
-
 
 @end
 
@@ -156,29 +111,33 @@ var CHARACTERSHEETHEIGHT = 800;
 @implementation AppController (NotificationHandlers)
 
 
-- (void) showCharacterSheetView:(CPNotification) aNotification{
-    CPLog.trace([characterSheetView superview]);
-    CPLog.trace(contentView);
-    [contentView addSubview: lightBoxView];
-    [contentView addSubview:characterSheetViewShadow];
-    [contentView addSubview:characterSheetView];
-    animateViewToPoint(characterSheetView, characterSheetDestination, characterSheetAnimation);
-    animateViewToPoint(characterSheetViewShadow, characterSheetDestination, characterSheetShadowAnimation);
-    
+- (void)animationDidEnd:(CPViewAnimation)animation{
+    CPLog.trace("Animation did end");
+
 }
 
--(void) removeSheets:(CPNotification)aNotification{
-    [lightBoxView removeFromSuperview];
+-(void)characterSheetWindowBacameMain:(CPNotification)notification{
+    CPLog.trace("Character sheet became main");
+    [[CPNotificationCenter defaultCenter] postNotificationName:"characterSheetBecameKey" object:self userInfo: nil];
+}
 
+- (void) showCharacterSheetView:(CPNotification) aNotification{
+    [characterSheetWindow makeKeyAndOrderFront: self];
+    var oldFrame = [characterSheetWindow frame];
+    CPLog.trace(oldFrame.origin.x);
+    oldFrame.origin.x -= CHARACTERSHEETWIDTH * 2;
+    CPLog.trace(oldFrame.origin.x);
+    [characterSheetWindow setFrame: oldFrame display: NO animate: YES];
+    [contentView addSubview: characterSheetlightBoxView]; 
+}
 
-    //TODO dont do this with the array as other sheets will not reset themselfs to the correct pos
-
-    [sheetsArray makeObjectsPerformSelector: @selector(removeFromSuperview)];
-    [sheetsArray makeObjectsPerformSelector: @selector(setFrameOrigin:) withObject: characterSheetOrigin];
-
-    [shadowArray makeObjectsPerformSelector: @selector(removeFromSuperview)];
-    [shadowArray makeObjectsPerformSelector: @selector(setFrameOrigin:) withObject: characterSheetOrigin];
-
+-(void) removeCharacterSheet:(CPNotification)aNotification{
+    [characterSheetlightBoxView removeFromSuperview];
+    [[CPNotificationCenter defaultCenter] postNotificationName:"characterSheetWillClose" object:self userInfo: nil];
+    var oldFrame = [characterSheetWindow frame];
+    oldFrame.origin.x += CHARACTERSHEETWIDTH * 2;
+    [characterSheetWindow setFrame: oldFrame display: YES animate: YES];
+    [characterSheetWindow close];
 }
 
 @end

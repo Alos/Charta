@@ -1,6 +1,9 @@
-@STATIC;1.0;I;21;Foundation/CPObject.jI;23;WKTextView/WKTextView.ji;20;CPView+ApplyShadow.jt;15453;objj_executeFile("Foundation/CPObject.j", NO);
+@STATIC;1.0;I;21;Foundation/CPObject.jI;23;WKTextView/WKTextView.ji;25;ui/CharacterSheetButton.ji;17;ui/LightBoxView.ji;38;ui/CharacterSheet/CharacterSheetView.ji;40;ui/CharacterSheet/CharacterSheetWindow.jt;21255;objj_executeFile("Foundation/CPObject.j", NO);
 objj_executeFile("WKTextView/WKTextView.j", NO);
-objj_executeFile("CPView+ApplyShadow.j", YES);
+objj_executeFile("ui/CharacterSheetButton.j", YES);
+objj_executeFile("ui/LightBoxView.j", YES);
+objj_executeFile("ui/CharacterSheet/CharacterSheetView.j", YES);
+objj_executeFile("ui/CharacterSheet/CharacterSheetWindow.j", YES);
 var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
     BoldToolbarItemIdentifier = "BoldToolbarItemIdentifier",
     ItalicsToolbarItemIdentifier = "ItalicsToolbarItemIdentifier",
@@ -17,17 +20,10 @@ var NewToolbarItemIdentifier = "NewToolbarItemIdentifier",
     BulletsToolbarItemIdentifier = "BulletsToolbarItemIdentifier",
     NumbersToolbarItemIdentifier = "NumbersToolbarItemIdentifier",
     RandomTextToolbarItemIdentifier = "RandomTextToolbarItemIdentifier";
+var CHARACTERSHEETWIDTH = 800;
+var CHARACTERSHEETHEIGHT = 800;
 {var the_class = objj_allocateClassPair(CPObject, "AppController"),
-meta_class = the_class.isa;class_addIvars(the_class, [new objj_ivar("contentView"), new objj_ivar("editorView"), new objj_ivar("toolbar")]);
-
-
-
-
-
-
-
-
-objj_registerClassPair(the_class);
+meta_class = the_class.isa;class_addIvars(the_class, [new objj_ivar("contentView"), new objj_ivar("editorView"), new objj_ivar("toolbar"), new objj_ivar("characterSheetButton"), new objj_ivar("characterSheetlightBoxView"), new objj_ivar("characterSheetWindow")]);objj_registerClassPair(the_class);
 class_addMethods(the_class, [new objj_method(sel_getUid("applicationDidFinishLaunching:"), function $AppController__applicationDidFinishLaunching_(self, _cmd, aNotification)
 {
     var theWindow = objj_msgSend(objj_msgSend(CPWindow, "alloc"), "initWithContentRect:styleMask:", CGRectMakeZero(), CPBorderlessBridgeWindowMask);
@@ -35,20 +31,82 @@ class_addMethods(the_class, [new objj_method(sel_getUid("applicationDidFinishLau
     var colorImage = objj_msgSend(objj_msgSend(CPImage, "alloc"), "initWithContentsOfFile:size:", objj_msgSend(objj_msgSend(CPBundle, "mainBundle"), "pathForResource:", "texture3.png"), CGSizeMake(97, 97));
     objj_msgSend(self.contentView, "setBackgroundColor:", objj_msgSend(CPColor, "colorWithPatternImage:", colorImage));
     var middle = (CGRectGetWidth(objj_msgSend(self.contentView, "bounds")) / 2) - 400;
-    self.editorView = objj_msgSend(objj_msgSend(WKTextView, "alloc"), "initWithFrame:", CGRectMake(middle, 40, 1000, CGRectGetHeight(objj_msgSend(self.contentView, "bounds")) - 80));
+    var calculatedEditorFrame = CGRectMake(middle, 40, 1000, CGRectGetHeight(objj_msgSend(self.contentView, "bounds")) - 80);
+    self.editorView = objj_msgSend(objj_msgSend(WKTextView, "alloc"), "initWithFrame:", calculatedEditorFrame);
     objj_msgSend(self.editorView, "setAutohidesScrollers:", NO);
     objj_msgSend(self.editorView, "setAutoresizingMask:", CPViewHeightSizable | CPViewMaxXMargin);
     objj_msgSend(self.editorView, "setDelegate:", self);
     objj_msgSend(self.editorView, "setShouldFocusAfterAction:", YES);
-    objj_msgSend(self.editorView, "applyShadow:offset:", objj_msgSend(CPColor, "blackColor"), 5.0);
+    var editorViewShadow = objj_msgSend(objj_msgSend(CPShadowView, "alloc"), "initWithFrame:", CGRectMakeZero());
+    objj_msgSend(editorViewShadow, "setFrameForContentFrame:", calculatedEditorFrame);
+    objj_msgSend(editorViewShadow, "setAutoresizingMask:", CPViewHeightSizable | CPViewMaxXMargin);
+    objj_msgSend(self.contentView, "addSubview:", editorViewShadow);
     objj_msgSend(self.contentView, "addSubview:", self.editorView);
+    self.characterSheetButton = objj_msgSend(objj_msgSend(CharacterSheetButton, "alloc"), "initWithFrame:", CGRectMake(CGRectGetWidth(objj_msgSend(self.contentView, "bounds")) - 50, CGRectGetHeight(objj_msgSend(self.contentView, "bounds"))/2 , 36 , 50));
+    objj_msgSend(self.characterSheetButton, "setAutoresizingMask:", CPViewMinXMargin | CPViewMinYMargin | CPViewMaxYMargin);
+    var characterSheetButtonShadow = objj_msgSend(objj_msgSend(CPShadowView, "alloc"), "initWithFrame:", CGRectMakeZero());
+    objj_msgSend(characterSheetButtonShadow, "setFrameForContentFrame:", CGRectMake(CGRectGetWidth(objj_msgSend(self.contentView, "bounds")) - 50, CGRectGetHeight(objj_msgSend(self.contentView, "bounds"))/2 , 36 , 50));
+    objj_msgSend(characterSheetButtonShadow, "setAutoresizingMask:", CPViewMinXMargin | CPViewMinYMargin | CPViewMaxYMargin);
+    objj_msgSend(self.contentView, "addSubview:", characterSheetButtonShadow);
+    objj_msgSend(self.contentView, "addSubview:", self.characterSheetButton);
     self.toolbar = objj_msgSend(objj_msgSend(CPToolbar, "alloc"), "initWithIdentifier:", "Styling");
     objj_msgSend(self.toolbar, "setDelegate:", self);
     objj_msgSend(self.toolbar, "setVisible:", YES);
     objj_msgSend(theWindow, "setToolbar:", self.toolbar);
     objj_msgSend(theWindow, "orderFront:", self);
+    self.characterSheetWindow = objj_msgSend(objj_msgSend(CharacterSheetWindow, "alloc"), "initWithContentRect:styleMask:", CGRectMake( CGRectGetWidth(objj_msgSend(self.contentView, "bounds")) + CHARACTERSHEETWIDTH, CGRectGetHeight(objj_msgSend(self.contentView, "bounds"))/2 - (CHARACTERSHEETHEIGHT/2) , CHARACTERSHEETWIDTH, CHARACTERSHEETHEIGHT), CPTitledWindowMask);
+    self.characterSheetlightBoxView = objj_msgSend(objj_msgSend(LightBoxView, "alloc"), "initWithFrame:", objj_msgSend(self.contentView, "bounds"));
+    objj_msgSend(self.characterSheetlightBoxView, "setAutoresizingMask:", CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin);
+    objj_msgSend(objj_msgSend(CPNotificationCenter, "defaultCenter"), "addObserver:selector:name:object:", self, sel_getUid("showCharacterSheetView:"), "ShowCharacterSheetView", nil);
+    objj_msgSend(objj_msgSend(CPNotificationCenter, "defaultCenter"), "addObserver:selector:name:object:", self, sel_getUid("removeCharacterSheet:"), "RemoveSheet", self.characterSheetlightBoxView);
+    objj_msgSend(objj_msgSend(CPNotificationCenter, "defaultCenter"), "addObserver:selector:name:object:", self, sel_getUid("characterSheetWindowBacameMain:"), "CPWindowDidBecomeMainNotification", self.characterSheetWindow);
 }
-,["void","CPNotification"]), new objj_method(sel_getUid("toolbarAllowedItemIdentifiers:"), function $AppController__toolbarAllowedItemIdentifiers_(self, _cmd, aToolbar)
+,["void","CPNotification"])]);
+}
+{
+var the_class = objj_getClass("AppController")
+if(!the_class) throw new SyntaxError("*** Could not find definition for class \"AppController\"");
+var meta_class = the_class.isa;
+
+
+class_addMethods(the_class, [new objj_method(sel_getUid("animationDidEnd:"), function $AppController__animationDidEnd_(self, _cmd, animation){
+    CPLog.trace("Animation did end");
+}
+,["void","CPViewAnimation"]), new objj_method(sel_getUid("characterSheetWindowBacameMain:"), function $AppController__characterSheetWindowBacameMain_(self, _cmd, notification){
+    CPLog.trace("Character sheet became main");
+    objj_msgSend(objj_msgSend(CPNotificationCenter, "defaultCenter"), "postNotificationName:object:userInfo:", "characterSheetBecameKey", self, nil);
+}
+,["void","CPNotification"]), new objj_method(sel_getUid("showCharacterSheetView:"), function $AppController__showCharacterSheetView_(self, _cmd, aNotification){
+    objj_msgSend(self.characterSheetWindow, "makeKeyAndOrderFront:", self);
+    var oldFrame = objj_msgSend(self.characterSheetWindow, "frame");
+    CPLog.trace(oldFrame.origin.x);
+    oldFrame.origin.x -= CHARACTERSHEETWIDTH * 2;
+    CPLog.trace(oldFrame.origin.x);
+    objj_msgSend(self.characterSheetWindow, "setFrame:display:animate:", oldFrame, NO, YES);
+    objj_msgSend(self.contentView, "addSubview:", self.characterSheetlightBoxView);
+}
+,["void","CPNotification"]), new objj_method(sel_getUid("removeCharacterSheet:"), function $AppController__removeCharacterSheet_(self, _cmd, aNotification){
+    objj_msgSend(self.characterSheetlightBoxView, "removeFromSuperview");
+    objj_msgSend(objj_msgSend(CPNotificationCenter, "defaultCenter"), "postNotificationName:object:userInfo:", "characterSheetWillClose", self, nil);
+    var oldFrame = objj_msgSend(self.characterSheetWindow, "frame");
+    oldFrame.origin.x += CHARACTERSHEETWIDTH * 2;
+    objj_msgSend(self.characterSheetWindow, "setFrame:display:animate:", oldFrame, YES, YES);
+    objj_msgSend(self.characterSheetWindow, "close");
+}
+,["void","CPNotification"])]);
+}
+{
+var the_class = objj_getClass("AppController")
+if(!the_class) throw new SyntaxError("*** Could not find definition for class \"AppController\"");
+var meta_class = the_class.isa;
+
+
+
+
+
+
+
+class_addMethods(the_class, [new objj_method(sel_getUid("toolbarAllowedItemIdentifiers:"), function $AppController__toolbarAllowedItemIdentifiers_(self, _cmd, aToolbar)
 {
     return [NewToolbarItemIdentifier, CPToolbarSpaceItemIdentifier, BoldToolbarItemIdentifier, ItalicsToolbarItemIdentifier, UnderlineToolbarItemIdentifier, StrikethroughToolbarItemIdentifier, CPToolbarSpaceItemIdentifier, AlignLeftToolbarItemIdentifier, AlignRightToolbarItemIdentifier, AlignCenterToolbarItemIdentifier, AlignFullToolbarItemIdentifier, CPToolbarSpaceItemIdentifier, BulletsToolbarItemIdentifier, NumbersToolbarItemIdentifier, InsertLinkToolbarItemIdentifier, UnlinkToolbarItemIdentifier, InsertImageToolbarItemIdentifier, FontToolbarItemIdentifier, CPToolbarFlexibleSpaceItemIdentifier, RandomTextToolbarItemIdentifier];
 }
@@ -148,3 +206,15 @@ class_addMethods(the_class, [new objj_method(sel_getUid("applicationDidFinishLau
 }
 ,["void",null])]);
 }
+var animateViewToPoint = function(view, point, animation)
+{
+    var dict = objj_msgSend(CPDictionary, "dictionary"),
+        frame1 = objj_msgSend(view, "frame"),
+        frame2 = objj_msgSend(view, "frame");
+    frame2.origin = point;
+    objj_msgSend(dict, "setValue:forKey:", view, CPViewAnimationTargetKey);
+    objj_msgSend(dict, "setValue:forKey:", frame1, CPViewAnimationStartFrameKey);
+    objj_msgSend(dict, "setValue:forKey:", frame2, CPViewAnimationEndFrameKey);
+    objj_msgSend(animation, "setViewAnimations:", [dict]);
+    objj_msgSend(animation, "startAnimation");
+};
