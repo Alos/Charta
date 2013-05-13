@@ -97,7 +97,6 @@ var CHARACTERSHEETHEIGHT = 800;
     characterSheetlightBoxView = [[LightBoxView alloc] initWithFrame: [contentView bounds]];
     [characterSheetlightBoxView setAutoresizingMask: CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
 
-   
     //Notifications
     [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(showCharacterSheetView:) name:"ShowCharacterSheetView" object:nil];
     [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(removeCharacterSheet:) name:"RemoveSheet" object:characterSheetlightBoxView];
