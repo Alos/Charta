@@ -28,20 +28,14 @@
 
             
             //Progressbar stuff
-            var progressValue = null,
-                progressBarPill = null;
+            var progressBarPill = null;
             OBJJ_PROGRESS_CALLBACK = function(percent)
             {
                 percent = 100 * percent;
-                
-                if (!progressValue)
-                {
-                    progressValue = document.getElementById("progressValue");
-                    progressBarPill = document.getElementById("progressBarPill");
-                }
 
-                progressValue.innerHTML = "Loading: " + ROUND(percent) + "%";
-                
+                if (!progressBarPill)
+                    progressBarPill = document.getElementById("progressBarPill");
+
                 if (percent > 5)
                     progressBarPill.style.width = percent + "%";
             }
