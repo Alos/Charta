@@ -130,10 +130,6 @@
 		[self addSubview: deleteButton];
 
 		//The notifications
-		/*[[CPNotificationCenter defaultCenter] addObserver:self 
-											  selector:@selector(characterSheetBecameKey:) 
-											  name:"characterSheetBecameKey" 
-											  object:nil];*/
 
 		[[CPNotificationCenter defaultCenter] addObserver:self 
 											  selector:@selector(characterSheetWillClose:) 
@@ -151,24 +147,12 @@
 }
 
 -(void) viewDidMoveToSuperview {
-	//CPLog.trace("tada!");
 	[characterName setEditable:YES];
 	[characterDescription setEditable:YES];
 	[characterTags setEditable:YES];
 	[characterAge setEditable: YES];
 }
 
-/**
-	When the sheet will show we enable editing of fields to prevent a bug in Cappuccino.
-	NOTE: Later fix the bug in capp
-
-- (void) characterSheetBecameKey:(CPNotification) aNotification{
-	[characterName setEditable:YES];
-	[characterDescription setEditable:YES];
-	[characterTags setEditable:YES];
-	[characterAge setEditable: YES];
-}
-*/
 /**
 	When the sheet will close we get rid of the editing of fields to prevent a bug in Cappuccino
 	NOTE: Later fix the bug in capp
