@@ -32,8 +32,6 @@
 - (id) initWithFrame:(CGRect) aFrame andParentTabViewItem:(CPTabViewItem) aTabViewItem{
 
 	if (self = [super initWithFrame:aFrame]){
-		//[self setBackgroundColor: [CPColor  colorWithHexString:@"DFDFDF"]];
-
 		//The name stuff
 	  	var nameLabel = [CPTextField labelWithTitle:@"Name:"];
 	   	[nameLabel setFrameOrigin:CGPointMake(55, 45)];
@@ -113,6 +111,7 @@
 
 		//File drop box
 		fileDropBox = [[FileDropBox alloc] initWithFrame: CGRectMake(450, 45, 300, 400)];
+		[fileDropBox setController:self];
 		[self addSubview: fileDropBox];
 
 		//The delete character button
@@ -131,10 +130,10 @@
 		[self addSubview: deleteButton];
 
 		//The notifications
-		[[CPNotificationCenter defaultCenter] addObserver:self 
+		/*[[CPNotificationCenter defaultCenter] addObserver:self 
 											  selector:@selector(characterSheetBecameKey:) 
 											  name:"characterSheetBecameKey" 
-											  object:nil];
+											  object:nil];*/
 
 		[[CPNotificationCenter defaultCenter] addObserver:self 
 											  selector:@selector(characterSheetWillClose:) 
@@ -150,17 +149,26 @@
 	}
 	return self;
 }
-/**
-	When the sheet will show we enable editing of fields to prevent a bug in Cappuccino.
-	NOTE: Later fix the bug in capp
-*/
-- (void) characterSheetBecameKey:(CPNotification) aNotification{
+
+-(void) viewDidMoveToSuperview {
+	//CPLog.trace("tada!");
 	[characterName setEditable:YES];
 	[characterDescription setEditable:YES];
 	[characterTags setEditable:YES];
 	[characterAge setEditable: YES];
 }
 
+/**
+	When the sheet will show we enable editing of fields to prevent a bug in Cappuccino.
+	NOTE: Later fix the bug in capp
+
+- (void) characterSheetBecameKey:(CPNotification) aNotification{
+	[characterName setEditable:YES];
+	[characterDescription setEditable:YES];
+	[characterTags setEditable:YES];
+	[characterAge setEditable: YES];
+}
+*/
 /**
 	When the sheet will close we get rid of the editing of fields to prevent a bug in Cappuccino
 	NOTE: Later fix the bug in capp
@@ -186,7 +194,6 @@
 	from the server
 */
 -(void)alertDidEnd:(CPAlert)theAlert returnCode:(int)returnCode{
-	CPLog.trace(returnCode);
 	if(returnCode == 0){
 		var info = [CPDictionary dictionaryWithObject: parentTabItemView forKey:"TabView"];
 		[[CPNotificationCenter defaultCenter] postNotificationName:"RemoveCharacter" object:self userInfo: info];

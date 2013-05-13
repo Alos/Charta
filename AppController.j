@@ -110,23 +110,19 @@ var CHARACTERSHEETHEIGHT = 800;
 
 @implementation AppController (NotificationHandlers)
 
-
-- (void)animationDidEnd:(CPViewAnimation)animation{
-    CPLog.trace("Animation did end");
-
-}
-
 -(void)characterSheetWindowBacameMain:(CPNotification)notification{
-    CPLog.trace("Character sheet became main");
     [[CPNotificationCenter defaultCenter] postNotificationName:"characterSheetBecameKey" object:self userInfo: nil];
 }
 
 - (void) showCharacterSheetView:(CPNotification) aNotification{
     [characterSheetWindow makeKeyAndOrderFront: self];
+    //Calculate the width position
     var oldFrame = [characterSheetWindow frame];
-    CPLog.trace(oldFrame.origin.x);
     oldFrame.origin.x -= CHARACTERSHEETWIDTH * 2;
-    CPLog.trace(oldFrame.origin.x);
+    //Recalculate the y position in case the window was resized
+    //TODO maybe move this to the windowbridge resize to make it faster
+    var newYPosition = CGRectGetHeight([contentView bounds])/2 - (CHARACTERSHEETHEIGHT/2);
+    oldFrame.origin.y = newYPosition; 
     [characterSheetWindow setFrame: oldFrame display: NO animate: YES];
     [contentView addSubview: characterSheetlightBoxView]; 
 }

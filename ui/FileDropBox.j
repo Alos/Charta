@@ -49,15 +49,15 @@ Box where the user will be able to drop pictures for their characters
 
         [self addSubview:borderOverlay];
 
-        [self registerForDraggedTypes:["ItemImageAttachment"]];
+        //[self registerForDraggedTypes:["ItemImageAttachment"]];
 
         // activate the view as a drop zone for uploads
-	    var fileDropUploadController = [[DCFileDropController alloc] initWithView:self 
+	    /*var fileDropUploadController = [[DCFileDropController alloc] initWithView:image 
 		                                                             dropDelegate:self 
 		                                                                uploadURL:[CPURL URLWithString:@"http://somepage.com/uploadImage"] 
 		                                                            uploadManager:[DCFileUploadManager sharedManager]];
 
-        [fileDropUploadController setValidFileTypes:["png","gif","jpg"]];
+        [fileDropUploadController setValidFileTypes:["png","gif","jpg"]];*/
 	}
 	return self;
 }
@@ -107,6 +107,7 @@ Box where the user will be able to drop pictures for their characters
     [theImage setDelegate:self];
 }
 
+/*
 - (void)fileDropUploadController:(DCFileDropController)theController setState:(BOOL)visible
 {
 	CPLog.trace("filedropcontrollersetsate visible:" + visible);
@@ -115,7 +116,7 @@ Box where the user will be able to drop pictures for their characters
     else
 		[self draggingExited:nil];
 }
-
+*/
 /*
 - (void)fileDropController:(DCFileUploadController)aController didBeginUpload:(DCFileUpload)anUpload
 {

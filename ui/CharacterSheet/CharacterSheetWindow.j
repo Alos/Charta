@@ -57,7 +57,6 @@
 }
 
 -(void) removeTabItemView:(CPNotification) aNotification {
-    CPLog.trace("removeing tab item view");
     var info = [aNotification userInfo];
     var aTabView = [info objectForKey:"TabView"];
     [characterTabs removeTabViewItem: aTabView];
@@ -68,7 +67,6 @@
 - (BOOL)tabView:(CPTabView)tabView shouldSelectTabViewItem:(CPTabViewItem )tabViewItem{
   if([tabViewItem identifier] == "AddCharacterTabViewItem"){
     tabCounter ++;
-    CPLog.trace("Tabview was add character, returning no. tabCounter:" + tabCounter);
     var newCharacterViewTab = [[CPTabViewItem alloc] initWithIdentifier: tabCounter]; 
     var newCharacterSheetView = [[CharacterSheetView alloc] initWithFrame:CPRectMakeZero() andParentTabViewItem: newCharacterViewTab];
     [newCharacterViewTab setLabel: @"New Character " + tabCounter]; 
@@ -76,12 +74,10 @@
     //[characterTabs addTabViewItem: newCharacterViewTab];
     var numberOfItems = [characterTabs numberOfTabViewItems];
     [characterTabs insertTabViewItem: newCharacterViewTab atIndex: tabCounter];
-    CPLog.trace("Label: " +  [newCharacterViewTab label]);
     return NO;
   } else {
     return YES;
   }
-
 }
 
 @end
