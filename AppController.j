@@ -102,7 +102,6 @@ var CHARACTERSHEETHEIGHT = 800;
     [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(showCharacterSheetView:) name:"ShowCharacterSheetView" object:nil];
     [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(removeCharacterSheet:) name:"RemoveSheet" object:characterSheetlightBoxView];
     [[CPNotificationCenter defaultCenter] addObserver:self selector:@selector(characterSheetWindowBacameMain:) name:"CPWindowDidBecomeMainNotification" object:characterSheetWindow];
-
 }
 
 @end
