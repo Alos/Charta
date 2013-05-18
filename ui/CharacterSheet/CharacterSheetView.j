@@ -32,6 +32,8 @@
 - (id) initWithFrame:(CGRect) aFrame andParentTabViewItem:(CPTabViewItem) aTabViewItem{
 
 	if (self = [super initWithFrame:aFrame]){
+		parentTabItemView = aTabViewItem;
+
 		//The name stuff
 	  	var nameLabel = [CPTextField labelWithTitle:@"Name:"];
 	   	[nameLabel setFrameOrigin:CGPointMake(55, 45)];
@@ -81,8 +83,7 @@
 		[self addSubview:femaleRadioButton];
 		[self addSubview:otherRadioButton];
 
-		parentTabItemView = aTabViewItem;
-		parentTabView = [parentTabItemView tabView];
+	
 
 		//The age
 	  	var ageLabel = [CPTextField labelWithTitle:@"Age:"];
@@ -169,8 +170,10 @@
 	NOTE: there is a bug in capp preventing this. Fix it later on.
 */
 -(void) nameDidChange:(CPNotification) aNotification {
-	CPLog.trace([characterName objectValue]);
+	if(!parentTabView)
+		parentTabView = [parentTabItemView tabView];
 	[parentTabItemView setLabel:[characterName objectValue]];
+	[parentTabView layoutSubviews];
 }
 /**
 	When the alert ends send a notification.
