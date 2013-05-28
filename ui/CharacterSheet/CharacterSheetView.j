@@ -10,19 +10,11 @@
 	CPTextField characterName  @accessors;
 	
 	LPMultiLineTextField characterDescription  @accessors;
-	
+	LPMultiLineTextField phycologicalDescription  @accessors;
+	LPMultiLineTextField sociologicalDescription  @accessors;
+
 	CPTokenField characterTags @accessors;
 	
-	CPRadioGroup radioGroup;
-	CPRadio maleRadioButton  @accessors;
-	CPRadio femaleRadioButton  @accessors;
-	CPRadio otherRadioButton  @accessors;
-	
-	CPTextField characterAge @accessors;
-
-	CPDatePicker characterBornDatePicker  @accessors;
-	CPDatePicker characterDeathDatePicker  @accessors;
-
 	CPTabViewItem parentTabItemView;
 	CPTabView parentTabView;
 
@@ -34,84 +26,70 @@
 	if (self = [super initWithFrame:aFrame]){
 		parentTabItemView = aTabViewItem;
 
+		CPLog.trace(CGRectGetWidth([self bounds]));
+		//Main data box
+		var mainDataBox = [[CPBox alloc] initWithFrame: CGRectMake(40, 40, 720, 300)];
+		[mainDataBox setTitle: "Phisical Description"];
+		[mainDataBox setTitlePosition: CPAtTop];
+		[mainDataBox setBoxType: CPBoxSeparator];
+		[self addSubview: mainDataBox];
+
 		//The name stuff
 	  	var nameLabel = [CPTextField labelWithTitle:@"Name:"];
-	   	[nameLabel setFrameOrigin:CGPointMake(55, 45)];
+	   	[nameLabel setFrameOrigin:CGPointMake(85, 85)];
 	   	[self addSubview: nameLabel];
 
-		characterName = [[CPTextField alloc] initWithFrame: CGRectMake(100, 40, 200, 29)];
+		characterName = [[CPTextField alloc] initWithFrame: CGRectMake(130, 80, 200, 29)];
 	    [characterName setBezeled:YES];
 	    [self addSubview: characterName];
 
 	  	//The description stuff
 	  	var descriptionLabel = [CPTextField labelWithTitle:@"Description:"];
-	   	[descriptionLabel setFrameOrigin:CGPointMake(28, 105)];
+	   	[descriptionLabel setFrameOrigin:CGPointMake(58, 125)];
 	   	[self addSubview: descriptionLabel];
 
-	   	characterDescription = [[LPMultiLineTextField alloc] initWithFrame: CGRectMake(100, 100, 300, 150)];
+	   	characterDescription = [[LPMultiLineTextField alloc] initWithFrame: CGRectMake(130, 120, 350, 200)];
 	    [characterDescription setBezeled:YES];
 	    [self addSubview: characterDescription];
 
-	  	//The Tags stuff
-	  	var tagsLabel = [CPTextField labelWithTitle:@"Tags:"];
-	   	[tagsLabel setFrameOrigin:CGPointMake(55, 295)];
-	   	[self addSubview: tagsLabel];
+	    //Phicological profile box
+	    var phycologicalDescriptionBox = [[CPBox alloc] initWithFrame: CGRectMake(40, 365, 340, 200)];
+		[phycologicalDescriptionBox setTitle: "Phisical Description"];
+		[phycologicalDescriptionBox setTitlePosition: CPAtTop];
+		[phycologicalDescriptionBox setBoxType: CPBoxSeparator];
+		[self addSubview: phycologicalDescriptionBox];
 
-	   	characterTags = [[CPTokenField alloc] initWithFrame: CGRectMake(100, 290, 300, 100)];
+		phycologicalDescription = [[LPMultiLineTextField alloc] initWithFrame: CGRectMake(50, 395, 318, 155)];
+	    [phycologicalDescription setBezeled:YES];
+	    [self addSubview: phycologicalDescription];
+
+
+		//Sociological description box
+		var sociologicalDescriptionBox = [[CPBox alloc] initWithFrame: CGRectMake(418, 365, 340, 200)];
+		[sociologicalDescriptionBox setTitle: "Sociological Description"];
+		[sociologicalDescriptionBox setTitlePosition: CPAtTop];
+		[sociologicalDescriptionBox setBoxType: CPBoxSeparator];
+		[self addSubview: sociologicalDescriptionBox];
+
+		sociologicalDescription = [[LPMultiLineTextField alloc] initWithFrame: CGRectMake(428, 395, 318, 155)];
+	    [sociologicalDescription setBezeled:YES];
+	    [self addSubview: sociologicalDescription];
+
+
+		//Sociological description box
+		var tagsBox = [[CPBox alloc] initWithFrame: CGRectMake(40, 585, 720, 80)];
+		[tagsBox setTitle: "Tags"];
+		[tagsBox setTitlePosition: CPAtTop];
+		[tagsBox setBoxType: CPBoxSeparator];
+		[self addSubview: tagsBox];
+
+	   	characterTags = [[CPTokenField alloc] initWithFrame: CGRectMake(50, 618, 700, 32)];
 	    [characterTags setBezeled:YES];
 	  	[self addSubview: characterTags];
-
-	  	//Sex radio button stuff
-	  	var sexLabel = [[CPTextField alloc] initWithFrame: CGRectMake(60, 434, 100, 30)];
-		[sexLabel setStringValue:"Sex:"];
-		[sexLabel sizeToFit];
-		[self addSubview:sexLabel];
-
-		maleRadioButton = [CPRadio radioWithTitle: "Male"];
-		femaleRadioButton = [CPRadio radioWithTitle: "Female"];
-		otherRadioButton = [CPRadio radioWithTitle: "Other"];
-		
-		radioGroup = [maleRadioButton radioGroup];
-		[femaleRadioButton setRadioGroup: radioGroup];
-		[otherRadioButton setRadioGroup: radioGroup];
-
-		[maleRadioButton setFrameOrigin: CGPointMake(100, 430)];
-		[femaleRadioButton setFrameOrigin: CGPointMake(CGRectGetMaxX([maleRadioButton frame]) + 8, CGRectGetMinY([maleRadioButton frame]))];
-		[otherRadioButton setFrameOrigin: CGPointMake(CGRectGetMaxX([femaleRadioButton frame]) + 8, CGRectGetMinY([femaleRadioButton frame]))];
-
-		[self addSubview:maleRadioButton];
-		[self addSubview:femaleRadioButton];
-		[self addSubview:otherRadioButton];
-
-	
-
-		//The age
-	  	var ageLabel = [CPTextField labelWithTitle:@"Age:"];
-	   	[ageLabel setFrameOrigin:CGPointMake(63, 475)];
-	   	[self addSubview: ageLabel];
-
-		characterAge = [[CPTextField alloc] initWithFrame: CGRectMake(100, 470, 50, 29)];
-	    [characterAge setBezeled:YES];
-	    [self addSubview: characterAge];
-
-
-	    //Born and died date
-	    var characterBornLabel = [CPTextField labelWithTitle:@"Born:"];
-	   	[characterBornLabel setFrameOrigin:CGPointMake(63, 520)];
-	   	[self addSubview: characterBornLabel];
-	    
-	    characterBornDatePicker =[[CPDatePicker alloc] initWithFrame: CGRectMake(103, 515, 200, 29)];
-	    [self addSubview: characterBornDatePicker];
-
-		var characterDeadLabel = [CPTextField labelWithTitle:@"Dead:"];
-	   	[characterDeadLabel setFrameOrigin:CGPointMake(63, 560)];
-	   	[self addSubview: characterDeadLabel];
-
-		characterDeathDatePicker =[[CPDatePicker alloc] initWithFrame: CGRectMake(103, 555, 200, 29)];
-	    [self addSubview: characterDeathDatePicker];
+	  
 
 		//File drop box
-		fileDropBox = [[FileDropBox alloc] initWithFrame: CGRectMake(450, 45, 300, 400)];
+		fileDropBox = [[FileDropBox alloc] initWithFrame: CGRectMake(540, 70, 200, 250)];
 		[fileDropBox setController:self];
 		[self addSubview: fileDropBox];
 
@@ -148,10 +126,11 @@
 }
 
 -(void) viewDidMoveToSuperview {
-	[characterName setEditable:YES];
-	[characterDescription setEditable:YES];
-	[characterTags setEditable:YES];
-	[characterAge setEditable: YES];
+	[characterName setEditable: YES];
+	[characterDescription setEditable: YES];
+	[phycologicalDescription setEditable: YES];
+	[sociologicalDescription setEditable: YES];
+	[characterTags setEditable: YES];
 }
 
 /**
@@ -162,7 +141,6 @@
 	[characterName setEditable:NO];
 	[characterDescription setEditable:NO];
 	[characterTags setEditable:NO];
-	[characterAge setEditable: NO];
 }
 
 /**
