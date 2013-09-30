@@ -1,7 +1,7 @@
 Charta
 ======
 
-UI concept for my HCI class. A preview is available [here](http://papyruschartas.appspot.com/)
+UI concept for my HCI class. A preview is available [here](http://papyruschartas.appspot.com/).
 
 
 # License
